@@ -5,21 +5,15 @@ import {
   CardHeader,
   CardTitle,
 } from '#/components/ui/card'
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from '#/components/ui/field'
-import { Input } from '#/components/ui/input'
+import { Field, FieldDescription, FieldGroup } from '#/components/ui/field'
+import { FormTextField } from '#/components/ui/form-text-field'
 import { authClient } from '#/lib/auth-client'
 import { LoginSchema } from '#/schemas/auth'
 import { useForm } from '@tanstack/react-form'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useTransition } from 'react'
 import { toast } from 'sonner'
-import { Button } from './ui/button'
+import { LoadingButton } from './ui/loading-button'
 
 export function LoginForm() {
   const navigate = useNavigate()
@@ -70,62 +64,38 @@ export function LoginForm() {
           <FieldGroup>
             <form.Field
               name="email"
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Email</FieldLabel>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                      placeholder="john@john.com"
-                      type="email"
-                      autoComplete="off"
-                    />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
-                  </Field>
-                )
-              }}
+              children={(field) => (
+                <FormTextField
+                  field={field}
+                  label="Email"
+                  placeholder="john@john.com"
+                  type="email"
+                  autoComplete="off"
+                />
+              )}
             />
 
             <form.Field
               name="password"
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                      placeholder="******"
-                      type="password"
-                      autoComplete="off"
-                    />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
-                  </Field>
-                )
-              }}
+              children={(field) => (
+                <FormTextField
+                  field={field}
+                  label="Password"
+                  placeholder="******"
+                  type="password"
+                  autoComplete="off"
+                />
+              )}
             />
 
             <Field>
-              <Button disabled={isPending} type="submit">
-                {isPending ? 'Logging in...' : 'Login'}
-              </Button>
+              <LoadingButton
+                isPending={isPending}
+                pendingText="Logging in..."
+                type="submit"
+              >
+                Login
+              </LoadingButton>
 
               <FieldDescription className="text-center">
                 Don&apos;t have an account? <Link to="/signup">Sign up</Link>

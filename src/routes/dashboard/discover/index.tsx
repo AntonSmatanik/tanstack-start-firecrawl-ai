@@ -7,13 +7,9 @@ import {
   CardTitle,
 } from '#/components/ui/card'
 import { Checkbox } from '#/components/ui/checkbox'
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from '#/components/ui/field'
-import { Input } from '#/components/ui/input'
+import { FieldGroup } from '#/components/ui/field'
+import { FormTextField } from '#/components/ui/form-text-field'
+import { LoadingButton } from '#/components/ui/loading-button'
 import { Progress } from '#/components/ui/progress'
 import type { BulkScrapeProgress } from '#/data/items'
 import { bulkScrapeUrlFn, searchWebFn } from '#/data/items'
@@ -148,45 +144,24 @@ function RouteComponent() {
               <FieldGroup>
                 <form.Field
                   name="query"
-                  children={(field) => {
-                    const isInvalid =
-                      field.state.meta.isTouched && !field.state.meta.isValid
-                    return (
-                      <Field data-invalid={isInvalid}>
-                        <FieldLabel htmlFor={field.name}>
-                          Search Query
-                        </FieldLabel>
-                        <Input
-                          id={field.name}
-                          name={field.name}
-                          value={field.state.value}
-                          onBlur={field.handleBlur}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          aria-invalid={isInvalid}
-                          placeholder="Enter your search query"
-                          autoComplete="off"
-                        />
-                        {isInvalid && (
-                          <FieldError errors={field.state.meta.errors} />
-                        )}
-                      </Field>
-                    )
-                  }}
+                  children={(field) => (
+                    <FormTextField
+                      field={field}
+                      label="Search Query"
+                      placeholder="Enter your search query"
+                      autoComplete="off"
+                    />
+                  )}
                 />
 
-                <Button disabled={isPending} type="submit">
-                  {isPending ? (
-                    <>
-                      <Loader2 className="size-4 animate-spin" />
-                      Searching...
-                    </>
-                  ) : (
-                    <>
-                      <Search className="size-4" />
-                      Search
-                    </>
-                  )}
-                </Button>
+                <LoadingButton
+                  isPending={isPending}
+                  pendingText="Searching..."
+                  type="submit"
+                >
+                  <Search className="size-4" />
+                  Search
+                </LoadingButton>
               </FieldGroup>
             </form>
 

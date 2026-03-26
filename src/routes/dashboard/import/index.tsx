@@ -7,13 +7,9 @@ import {
   CardTitle,
 } from '#/components/ui/card'
 import { Checkbox } from '#/components/ui/checkbox'
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from '#/components/ui/field'
-import { Input } from '#/components/ui/input'
+import { FieldGroup } from '#/components/ui/field'
+import { FormTextField } from '#/components/ui/form-text-field'
+import { LoadingButton } from '#/components/ui/loading-button'
 import { Progress } from '#/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '#/components/ui/tabs'
 import type { BulkScrapeProgress } from '#/data/items'
@@ -172,44 +168,24 @@ function RouteComponent() {
                   <FieldGroup>
                     <form.Field
                       name="url"
-                      children={(field) => {
-                        const isInvalid =
-                          field.state.meta.isTouched &&
-                          !field.state.meta.isValid
-                        return (
-                          <Field data-invalid={isInvalid}>
-                            <FieldLabel htmlFor={field.name}>URL</FieldLabel>
-                            <Input
-                              id={field.name}
-                              name={field.name}
-                              value={field.state.value}
-                              onBlur={field.handleBlur}
-                              onChange={(e) =>
-                                field.handleChange(e.target.value)
-                              }
-                              aria-invalid={isInvalid}
-                              placeholder="https://example.com"
-                              type="url"
-                              autoComplete="off"
-                            />
-                            {isInvalid && (
-                              <FieldError errors={field.state.meta.errors} />
-                            )}
-                          </Field>
-                        )
-                      }}
+                      children={(field) => (
+                        <FormTextField
+                          field={field}
+                          label="URL"
+                          placeholder="https://example.com"
+                          type="url"
+                          autoComplete="off"
+                        />
+                      )}
                     />
 
-                    <Button disabled={isPending} type="submit">
-                      {isPending ? (
-                        <>
-                          <Loader2 className="size-4 animate-spin" />
-                          Importing...
-                        </>
-                      ) : (
-                        'Import'
-                      )}
-                    </Button>
+                    <LoadingButton
+                      isPending={isPending}
+                      pendingText="Importing..."
+                      type="submit"
+                    >
+                      Import
+                    </LoadingButton>
                   </FieldGroup>
                 </form>
               </CardContent>
@@ -234,74 +210,37 @@ function RouteComponent() {
                   <FieldGroup>
                     <bulkForm.Field
                       name="url"
-                      children={(field) => {
-                        const isInvalid =
-                          field.state.meta.isTouched &&
-                          !field.state.meta.isValid
-                        return (
-                          <Field data-invalid={isInvalid}>
-                            <FieldLabel htmlFor={field.name}>URL</FieldLabel>
-                            <Input
-                              id={field.name}
-                              name={field.name}
-                              value={field.state.value}
-                              onBlur={field.handleBlur}
-                              onChange={(e) =>
-                                field.handleChange(e.target.value)
-                              }
-                              aria-invalid={isInvalid}
-                              placeholder="https://example.com"
-                              type="url"
-                              autoComplete="off"
-                            />
-                            {isInvalid && (
-                              <FieldError errors={field.state.meta.errors} />
-                            )}
-                          </Field>
-                        )
-                      }}
+                      children={(field) => (
+                        <FormTextField
+                          field={field}
+                          label="URL"
+                          placeholder="https://example.com"
+                          type="url"
+                          autoComplete="off"
+                        />
+                      )}
                     />
 
                     <bulkForm.Field
                       name="search"
-                      children={(field) => {
-                        const isInvalid =
-                          field.state.meta.isTouched &&
-                          !field.state.meta.isValid
-                        return (
-                          <Field data-invalid={isInvalid}>
-                            <FieldLabel htmlFor={field.name}>Search</FieldLabel>
-                            <Input
-                              id={field.name}
-                              name={field.name}
-                              value={field.state.value}
-                              onBlur={field.handleBlur}
-                              onChange={(e) =>
-                                field.handleChange(e.target.value)
-                              }
-                              aria-invalid={isInvalid}
-                              placeholder="e.g. blog, articles, etc."
-                              type="text"
-                              autoComplete="off"
-                            />
-                            {isInvalid && (
-                              <FieldError errors={field.state.meta.errors} />
-                            )}
-                          </Field>
-                        )
-                      }}
+                      children={(field) => (
+                        <FormTextField
+                          field={field}
+                          label="Search"
+                          placeholder="e.g. blog, articles, etc."
+                          type="text"
+                          autoComplete="off"
+                        />
+                      )}
                     />
 
-                    <Button disabled={isPending} type="submit">
-                      {isPending ? (
-                        <>
-                          <Loader2 className="size-4 animate-spin" />
-                          Importing...
-                        </>
-                      ) : (
-                        'Import'
-                      )}
-                    </Button>
+                    <LoadingButton
+                      isPending={isPending}
+                      pendingText="Importing..."
+                      type="submit"
+                    >
+                      Import
+                    </LoadingButton>
                   </FieldGroup>
                 </form>
 
