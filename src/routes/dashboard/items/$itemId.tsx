@@ -7,10 +7,19 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '#/components/ui/collapsible'
-import { getItemByIdFn, saveSummaryAndGenerateTagsFn } from '#/data/items'
+import {
+  deleteItemFn,
+  getItemByIdFn,
+  saveSummaryAndGenerateTagsFn,
+} from '#/data/items'
 import { cn } from '#/lib/utils'
 import { useCompletion } from '@ai-sdk/react'
-import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
+import {
+  createFileRoute,
+  Link,
+  useNavigate,
+  useRouter,
+} from '@tanstack/react-router'
 import {
   ArrowLeft,
   Calendar,
@@ -19,9 +28,10 @@ import {
   ExternalLink,
   Loader2,
   Sparkles,
+  Trash2,
   User,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/dashboard/items/$itemId')({
@@ -48,6 +58,16 @@ function RouteComponent() {
   const data = Route.useLoaderData()
   const [contentOpen, setContentOpen] = useState(true)
   const router = useRouter()
+  const navigate = useNavigate()
+  const [isDeleting, startDeleteTransition] = useTransition()
+
+  const handleDelete = () => {
+    startDeleteTransition(async () => {
+      await deleteItemFn({ data: { id: data.id } })
+      toast.success('Item deleted')
+      navigate({ to: '/dashboard/items' })
+    })
+  }
 
   const { completion, complete, isLoading } = useCompletion({
     api: '/api/ai/summary',
@@ -83,7 +103,7 @@ function RouteComponent() {
 
   return (
     <div className="mx-auto space-y-6 w-full">
-      <div className="flex justify-start">
+      <div className="flex justify-between">
         <Link
           to="/dashboard/items"
           className={buttonVariants({
@@ -93,6 +113,15 @@ function RouteComponent() {
           <ArrowLeft />
           Go Back
         </Link>
+        <Button
+          variant="outline"
+          onClick={handleDelete}
+          disabled={isDeleting}
+          className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
+        >
+          <Trash2 className="size-4" />
+          {isDeleting ? 'Deleting...' : 'Delete'}
+        </Button>
       </div>
 
       {data.ogImage && (

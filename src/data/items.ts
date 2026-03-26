@@ -242,6 +242,25 @@ export const saveSummaryAndGenerateTagsFn = createServerFn({
     return item
   })
 
+export const deleteItemFn = createServerFn({
+  method: 'POST',
+})
+  .middleware([authFnMiddleware])
+  .inputValidator(z.object({ id: z.string() }))
+  .handler(async ({ data, context }) => {
+    const item = await prisma.savedItem.findFirst({
+      where: { id: data.id, userId: context.session.user.id },
+    })
+
+    if (!item) {
+      throw notFound()
+    }
+
+    await prisma.savedItem.delete({
+      where: { id: data.id },
+    })
+  })
+
 export const searchWebFn = createServerFn({
   method: 'POST',
 })

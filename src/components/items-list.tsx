@@ -14,11 +14,12 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '#/components/ui/empty'
-import type { getItemsFn } from '#/data/items'
+import { deleteItemFn, type getItemsFn } from '#/data/items'
 import { copyToClipboardFn } from '#/lib/clipboard'
-import { Link } from '@tanstack/react-router'
-import { Copy, Inbox } from 'lucide-react'
-import { use, useMemo } from 'react'
+import { Link, useRouter } from '@tanstack/react-router'
+import { Copy, Inbox, Trash2 } from 'lucide-react'
+import { use, useMemo, useTransition } from 'react'
+import { toast } from 'sonner'
 
 export const ItemsList = ({
   data,
@@ -30,6 +31,16 @@ export const ItemsList = ({
   status: string
 }) => {
   const items = use(data)
+  const router = useRouter()
+  const [isDeleting, startTransition] = useTransition()
+
+  const handleDelete = (id: string) => {
+    startTransition(async () => {
+      await deleteItemFn({ data: { id } })
+      toast.success('Item deleted')
+      router.invalidate()
+    })
+  }
 
   const filteredData = useMemo(
     () =>
@@ -104,17 +115,31 @@ export const ItemsList = ({
                 >
                   {item.status.toLocaleLowerCase()}
                 </Badge>
-                <Button
-                  onClick={async (e) => {
-                    e.preventDefault()
-                    await copyToClipboardFn(item.url)
-                  }}
-                  variant="outline"
-                  size="icon"
-                  className="size-8"
-                >
-                  <Copy className="size-4" />
-                </Button>
+                <div className="flex gap-1">
+                  <Button
+                    onClick={async (e) => {
+                      e.preventDefault()
+                      await copyToClipboardFn(item.url)
+                    }}
+                    variant="outline"
+                    size="icon"
+                    className="size-8"
+                  >
+                    <Copy className="size-4" />
+                  </Button>
+                  <Button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handleDelete(item.id)
+                    }}
+                    variant="outline"
+                    size="icon"
+                    className="size-8 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                    disabled={isDeleting}
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </div>
               </div>
 
               <CardTitle className="line-clamp-1 text-xl leading-snug group-hover:text-amber-300 transition-colors">

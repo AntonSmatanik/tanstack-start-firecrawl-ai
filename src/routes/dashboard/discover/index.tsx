@@ -1,4 +1,3 @@
-import { Button } from '#/components/ui/button'
 import {
   Card,
   CardContent,
@@ -6,20 +5,18 @@ import {
   CardHeader,
   CardTitle,
 } from '#/components/ui/card'
-import { Checkbox } from '#/components/ui/checkbox'
 import { FieldGroup } from '#/components/ui/field'
 import { FormTextField } from '#/components/ui/form-text-field'
 import { LoadingButton } from '#/components/ui/loading-button'
-import { Progress } from '#/components/ui/progress'
-import type { BulkScrapeProgress } from '#/data/items'
-import { bulkScrapeUrlFn, searchWebFn } from '#/data/items'
+import { UrlSelectionList } from '#/components/url-selection-list'
+import { searchWebFn } from '#/data/items'
+import { useBulkImport } from '#/hooks/use-bulk-import'
 import { SearchSchema } from '#/schemas/import'
 import type { SearchResultWeb } from '@mendable/firecrawl-js'
 import { useForm } from '@tanstack/react-form'
 import { createFileRoute } from '@tanstack/react-router'
-import { Loader2, Search, Sparkles } from 'lucide-react'
+import { Search, Sparkles } from 'lucide-react'
 import { useState, useTransition } from 'react'
-import { toast } from 'sonner'
 
 export const Route = createFileRoute('/dashboard/discover/')({
   component: RouteComponent,
@@ -28,72 +25,14 @@ export const Route = createFileRoute('/dashboard/discover/')({
 function RouteComponent() {
   const [searchResults, setSearchResults] = useState<SearchResultWeb[]>([])
   const [isPending, startTransition] = useTransition()
-  const [selectedUrls, setSelectedUrls] = useState<Set<string>>(new Set())
-  const [isBulkPending, startBulkTransition] = useTransition()
-  const [progress, setProgress] = useState<BulkScrapeProgress | null>(null)
-
-  const handleSelectAll = () => {
-    if (selectedUrls.size === searchResults.length) {
-      setSelectedUrls(new Set())
-    } else {
-      setSelectedUrls(new Set(searchResults.map((item) => item.url)))
-    }
-  }
-
-  const handleUrlToggle = (url: string) => {
-    setSelectedUrls((prev) => {
-      const newSet = new Set(prev)
-      if (newSet.has(url)) {
-        newSet.delete(url)
-      } else {
-        newSet.add(url)
-      }
-      return newSet
-    })
-  }
-
-  const handleBulkImport = async () => {
-    startBulkTransition(async () => {
-      if (selectedUrls.size === 0) {
-        toast.error('Please select at least one URL to import.')
-        return
-      }
-
-      setProgress({
-        completed: 0,
-        total: selectedUrls.size,
-        url: '',
-        status: 'success',
-      })
-
-      let successCount = 0
-      let failedCount = 0
-
-      for await (const update of await bulkScrapeUrlFn({
-        data: {
-          urls: Array.from(selectedUrls),
-        },
-      })) {
-        setProgress(update)
-
-        if (update.status === 'success') {
-          successCount++
-        } else {
-          failedCount++
-        }
-      }
-
-      setProgress(null)
-
-      if (failedCount > 0) {
-        toast.success(
-          `Successfully imported ${successCount} URLs, ${failedCount} failed.`,
-        )
-      } else {
-        toast.success(`Successfully imported ${successCount} URLs!`)
-      }
-    })
-  }
+  const {
+    selectedUrls,
+    isBulkPending,
+    progress,
+    handleSelectAll,
+    handleUrlToggle,
+    handleBulkImport,
+  } = useBulkImport(searchResults)
 
   const form = useForm({
     defaultValues: {
@@ -166,83 +105,15 @@ function RouteComponent() {
             </form>
 
             {searchResults.length > 0 && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium">
-                    Found {searchResults.length} URLs
-                  </p>
-
-                  <Button variant="outline" size="sm" onClick={handleSelectAll}>
-                    {selectedUrls.size === searchResults.length
-                      ? 'Deselect All'
-                      : 'Select All'}
-                  </Button>
-                </div>
-
-                <div className="max-h-80 space-y-2 overflow-y-auto rounded-md border p-4">
-                  {searchResults.map((item) => (
-                    <label
-                      key={item.url}
-                      className="hover:bg-muted/50 flex cursor-pointer items-start gap-3 rounded-md p-2"
-                    >
-                      <Checkbox
-                        className="mt-0.5"
-                        checked={selectedUrls.has(item.url)}
-                        onCheckedChange={() => handleUrlToggle(item.url)}
-                      />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium">
-                          {item.title ?? 'No title'}
-                        </p>
-
-                        <p className="truncate text-xs text-muted-foreground">
-                          {item.description ?? 'No description'}
-                        </p>
-
-                        <p className="truncate text-xs text-muted-foreground">
-                          {item.url}
-                        </p>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-
-                {progress && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between trext-sm">
-                      <span className="text-muted-foreground">
-                        Importing: {progress.completed}/{progress.total}
-                      </span>
-                      <span className="font-medium">
-                        {Math.round(
-                          (progress.completed / progress.total) * 100,
-                        )}
-                      </span>
-                    </div>
-                    <Progress
-                      value={(progress.completed / progress.total) * 100}
-                    />
-                  </div>
-                )}
-
-                <Button
-                  disabled={isBulkPending}
-                  className="w-full"
-                  onClick={handleBulkImport}
-                  type="button"
-                >
-                  {isBulkPending ? (
-                    <>
-                      <Loader2 className="size-4 animate-spin" />
-                      {progress
-                        ? `Importing ${progress.completed}/${progress.total}...`
-                        : 'Starting...'}
-                    </>
-                  ) : (
-                    `Import ${selectedUrls.size} URLs`
-                  )}
-                </Button>
-              </div>
+              <UrlSelectionList
+                items={searchResults}
+                selectedUrls={selectedUrls}
+                isBulkPending={isBulkPending}
+                progress={progress}
+                onSelectAll={handleSelectAll}
+                onUrlToggle={handleUrlToggle}
+                onBulkImport={handleBulkImport}
+              />
             )}
           </CardContent>
         </Card>
