@@ -7,11 +7,8 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '#/components/ui/collapsible'
-import {
-  deleteItemFn,
-  getItemByIdFn,
-  saveSummaryAndGenerateTagsFn,
-} from '#/data/items'
+import { getItemByIdFn, saveSummaryAndGenerateTagsFn } from '#/data/items'
+import { useDeleteItem } from '#/hooks/use-delete-item'
 import { cn } from '#/lib/utils'
 import { useCompletion } from '@ai-sdk/react'
 import {
@@ -31,7 +28,7 @@ import {
   Trash2,
   User,
 } from 'lucide-react'
-import { useState, useTransition } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/dashboard/items/$itemId')({
@@ -59,15 +56,9 @@ function RouteComponent() {
   const [contentOpen, setContentOpen] = useState(true)
   const router = useRouter()
   const navigate = useNavigate()
-  const [isDeleting, startDeleteTransition] = useTransition()
-
-  const handleDelete = () => {
-    startDeleteTransition(async () => {
-      await deleteItemFn({ data: { id: data.id } })
-      toast.success('Item deleted')
-      navigate({ to: '/dashboard/items' })
-    })
-  }
+  const { isDeleting, handleDelete: deleteItem } = useDeleteItem(() =>
+    navigate({ to: '/dashboard/items' }),
+  )
 
   const { completion, complete, isLoading } = useCompletion({
     api: '/api/ai/summary',
@@ -115,7 +106,7 @@ function RouteComponent() {
         </Link>
         <Button
           variant="outline"
-          onClick={handleDelete}
+          onClick={() => deleteItem(data.id)}
           disabled={isDeleting}
           className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
         >

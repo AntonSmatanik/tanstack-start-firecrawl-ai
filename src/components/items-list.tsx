@@ -14,12 +14,12 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '#/components/ui/empty'
-import { deleteItemFn, type getItemsFn } from '#/data/items'
+import type { getItemsFn } from '#/data/items'
+import { useDeleteItem } from '#/hooks/use-delete-item'
 import { copyToClipboardFn } from '#/lib/clipboard'
 import { Link, useRouter } from '@tanstack/react-router'
 import { Copy, Inbox, Trash2 } from 'lucide-react'
-import { use, useMemo, useTransition } from 'react'
-import { toast } from 'sonner'
+import { use, useMemo } from 'react'
 
 export const ItemsList = ({
   data,
@@ -32,15 +32,7 @@ export const ItemsList = ({
 }) => {
   const items = use(data)
   const router = useRouter()
-  const [isDeleting, startTransition] = useTransition()
-
-  const handleDelete = (id: string) => {
-    startTransition(async () => {
-      await deleteItemFn({ data: { id } })
-      toast.success('Item deleted')
-      router.invalidate()
-    })
-  }
+  const { isDeleting, handleDelete } = useDeleteItem(() => router.invalidate())
 
   const filteredData = useMemo(
     () =>

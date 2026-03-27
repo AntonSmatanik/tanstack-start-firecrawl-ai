@@ -10,10 +10,11 @@ import {
 } from '#/components/ui/select'
 import { getItemsFn } from '#/data/items'
 import { ItemStatus } from '#/generated/prisma/enums'
+import { useDebouncedSearch } from '#/hooks/use-debounced-search'
 import { ItemsSearchSchema } from '#/schemas/items'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { zodValidator } from '@tanstack/zod-adapter'
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useCallback } from 'react'
 
 export const Route = createFileRoute('/dashboard/items/')({
   component: RouteComponent,
@@ -35,25 +36,26 @@ export const Route = createFileRoute('/dashboard/items/')({
 function RouteComponent() {
   const { itemsPromise } = Route.useLoaderData()
   const { query, status } = Route.useSearch()
-  const [searchInput, setSearchInput] = useState(query)
   const navigate = useNavigate({
     from: Route.fullPath,
   })
 
-  useEffect(() => {
-    if (searchInput !== query) {
-      const timeoutId = setTimeout(() => {
-        navigate({
-          search: (prev) => ({
-            ...prev,
-            query: searchInput,
-          }),
-        })
-      }, 500)
+  const handleSearch = useCallback(
+    (value: string) => {
+      navigate({
+        search: (prev) => ({
+          ...prev,
+          query: value,
+        }),
+      })
+    },
+    [navigate],
+  )
 
-      return () => clearTimeout(timeoutId)
-    }
-  }, [searchInput, navigate, query])
+  const { searchInput, setSearchInput } = useDebouncedSearch(
+    query,
+    handleSearch,
+  )
 
   return (
     <div className="flex flex-1 flex-col gap-6">
