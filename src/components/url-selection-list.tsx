@@ -1,7 +1,7 @@
 import { Button } from '#/components/ui/button'
 import { Checkbox } from '#/components/ui/checkbox'
 import { Progress } from '#/components/ui/progress'
-import type { BulkScrapeProgress } from '#/data/items'
+import type { BulkScrapeProgress } from '#/server/items'
 import type { SearchResultWeb } from '@mendable/firecrawl-js'
 import { Loader2 } from 'lucide-react'
 

@@ -27,6 +27,7 @@ export function SignupForm() {
     },
     validators: {
       onSubmit: SignupSchema,
+      onChange: SignupSchema,
     },
     onSubmit: ({ value }) => {
       startTransition(async () => {

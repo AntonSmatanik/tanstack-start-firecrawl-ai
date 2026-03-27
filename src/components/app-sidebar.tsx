@@ -15,8 +15,8 @@ import {
 
 import type { NavPrimaryProps, NavUserProps } from '@/lib/types'
 import { Link, linkOptions } from '@tanstack/react-router'
-import { NavPrimary } from './web/nav-primary'
-import { NavUser } from './web/nav-user'
+import { NavPrimary } from './custom/nav-primary'
+import { NavUser } from './custom/nav-user'
 
 const navItems: NavPrimaryProps['items'] = linkOptions([
   {

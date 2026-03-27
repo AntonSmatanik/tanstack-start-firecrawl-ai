@@ -1,5 +1,5 @@
 import { AppSidebar } from '#/components/app-sidebar'
-import { getSessionFn } from '#/data/session'
+import { getSessionFn } from '#/server/session'
 import { Separator } from '@/components/ui/separator'
 import {
   SidebarInset,

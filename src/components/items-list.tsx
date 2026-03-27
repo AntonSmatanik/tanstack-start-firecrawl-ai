@@ -14,9 +14,9 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '#/components/ui/empty'
-import type { getItemsFn } from '#/data/items'
 import { useDeleteItem } from '#/hooks/use-delete-item'
 import { copyToClipboardFn } from '#/lib/clipboard'
+import type { getItemsFn } from '#/server/items'
 import { Link, useRouter } from '@tanstack/react-router'
 import { Copy, Inbox, Trash2 } from 'lucide-react'
 import { use, useMemo } from 'react'

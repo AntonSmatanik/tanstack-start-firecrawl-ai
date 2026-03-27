@@ -8,10 +8,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '#/components/ui/select'
-import { getItemsFn } from '#/data/items'
 import { ItemStatus } from '#/generated/prisma/enums'
 import { useDebouncedSearch } from '#/hooks/use-debounced-search'
 import { ItemsSearchSchema } from '#/schemas/items'
+import { getItemsFn } from '#/server/items'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { zodValidator } from '@tanstack/zod-adapter'
 import { Suspense, useCallback } from 'react'

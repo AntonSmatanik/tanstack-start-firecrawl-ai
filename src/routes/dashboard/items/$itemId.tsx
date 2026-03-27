@@ -7,9 +7,9 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '#/components/ui/collapsible'
-import { getItemByIdFn, saveSummaryAndGenerateTagsFn } from '#/data/items'
 import { useDeleteItem } from '#/hooks/use-delete-item'
 import { cn } from '#/lib/utils'
+import { getItemByIdFn, saveSummaryAndGenerateTagsFn } from '#/server/items'
 import { useCompletion } from '@ai-sdk/react'
 import {
   createFileRoute,

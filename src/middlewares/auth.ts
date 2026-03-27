@@ -4,7 +4,7 @@ import { createMiddleware } from '@tanstack/react-start'
 import { getRequestHeaders } from '@tanstack/react-start/server'
 
 const publicPaths = ['/api/auth']
-const protectedPaths = ['/dashboard', '/api']
+const privatePaths = ['/dashboard', '/api']
 
 export const authFnMiddleware = createMiddleware({
   type: 'function',
@@ -28,7 +28,7 @@ export const authMiddleware = createMiddleware({
     return next()
   }
 
-  if (!protectedPaths.some((path) => url.pathname.startsWith(path))) {
+  if (!privatePaths.some((path) => url.pathname.startsWith(path))) {
     return next()
   }
 

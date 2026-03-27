@@ -1,4 +1,4 @@
-import { deleteItemFn } from '#/data/items'
+import { deleteItemFn } from '#/server/items'
 import { useTransition } from 'react'
 import { toast } from 'sonner'
 

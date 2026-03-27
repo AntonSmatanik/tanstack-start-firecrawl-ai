@@ -1,5 +1,5 @@
-import type { BulkScrapeProgress } from '#/data/items'
-import { bulkScrapeUrlFn } from '#/data/items'
+import type { BulkScrapeProgress } from '#/server/items'
+import { bulkScrapeUrlFn } from '#/server/items'
 import type { SearchResultWeb } from '@mendable/firecrawl-js'
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'

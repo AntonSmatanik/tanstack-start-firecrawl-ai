@@ -26,6 +26,7 @@ export function LoginForm() {
     },
     validators: {
       onSubmit: LoginSchema,
+      onChange: LoginSchema,
     },
     onSubmit: ({ value }) => {
       startTransition(async () => {
