@@ -7,6 +7,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '#/components/ui/collapsible'
+import { ConfirmModal } from '#/components/ui/confirm-modal'
 import { useDeleteItem } from '#/hooks/use-delete-item'
 import { cn } from '#/lib/utils'
 import { getItemByIdFn, saveSummaryAndGenerateTagsFn } from '#/server/items'
@@ -60,6 +61,8 @@ function RouteComponent() {
     navigate({ to: '/dashboard/items' }),
   )
 
+  const [modalOpen, setModalOpen] = useState(false)
+
   const { completion, complete, isLoading } = useCompletion({
     api: '/api/ai/summary',
     initialCompletion: data.summary ?? undefined,
@@ -104,15 +107,30 @@ function RouteComponent() {
           <ArrowLeft />
           Go Back
         </Link>
-        <Button
-          variant="outline"
-          onClick={() => deleteItem(data.id)}
-          disabled={isDeleting}
-          className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
-        >
-          <Trash2 className="size-4" />
-          {isDeleting ? 'Deleting...' : 'Delete'}
-        </Button>
+        <>
+          <Button
+            variant="outline"
+            onClick={() => setModalOpen(true)}
+            disabled={isDeleting}
+            className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
+          >
+            <Trash2 className="size-4" />
+            {isDeleting ? 'Deleting...' : 'Delete'}
+          </Button>
+
+          <ConfirmModal
+            open={modalOpen}
+            title="Delete Item"
+            description="Are you sure you want to delete this item? This action cannot be undone."
+            confirmText="Delete"
+            cancelText="Cancel"
+            onCancel={() => setModalOpen(false)}
+            onConfirm={() => {
+              deleteItem(data.id)
+              setModalOpen(false)
+            }}
+          />
+        </>
       </div>
 
       {data.ogImage && (

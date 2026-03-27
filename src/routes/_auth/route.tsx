@@ -4,6 +4,17 @@ import { ArrowLeft } from 'lucide-react'
 
 export const Route = createFileRoute('/_auth')({
   component: RouteComponent,
+  head: () => ({
+    meta: [
+      {
+        title: 'Account',
+      },
+      {
+        property: 'og:title',
+        content: 'Account',
+      },
+    ],
+  }),
 })
 
 function RouteComponent() {

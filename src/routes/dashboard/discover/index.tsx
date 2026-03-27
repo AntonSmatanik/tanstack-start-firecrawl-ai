@@ -20,6 +20,17 @@ import { useState, useTransition } from 'react'
 
 export const Route = createFileRoute('/dashboard/discover/')({
   component: RouteComponent,
+  head: () => ({
+    meta: [
+      {
+        title: 'Discover',
+      },
+      {
+        property: 'og:title',
+        content: 'Discover',
+      },
+    ],
+  }),
 })
 
 function RouteComponent() {

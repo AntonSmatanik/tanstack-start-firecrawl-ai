@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from '#/components/ui/card'
+import { ConfirmModal } from '#/components/ui/confirm-modal'
 import {
   Empty,
   EmptyContent,
@@ -19,7 +20,7 @@ import { copyToClipboardFn } from '#/lib/clipboard'
 import type { getItemsFn } from '#/server/items'
 import { Link, useRouter } from '@tanstack/react-router'
 import { Copy, Inbox, Trash2 } from 'lucide-react'
-import { use, useMemo } from 'react'
+import { use, useMemo, useState } from 'react'
 
 export const ItemsList = ({
   data,
@@ -33,6 +34,8 @@ export const ItemsList = ({
   const items = use(data)
   const router = useRouter()
   const { isDeleting, handleDelete } = useDeleteItem(() => router.invalidate())
+  const [isModalOpen, setModalOpen] = useState<boolean>(false)
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
 
   const filteredData = useMemo(
     () =>
@@ -79,88 +82,110 @@ export const ItemsList = ({
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
-      {filteredData.map((item) => (
-        <Card
-          key={item.id}
-          className="group overflow-hidden transition-all pt-0 hover:shadow-lg"
-        >
-          <Link
-            to="/dashboard/items/$itemId"
-            params={{
-              itemId: item.id,
-            }}
-            className="block"
+    <>
+      <div className="grid gap-4 md:grid-cols-2">
+        {filteredData.map((item) => (
+          <Card
+            key={item.id}
+            className="group overflow-hidden transition-all pt-0 hover:shadow-lg"
           >
-            <div className="aspect-video w-full overflow-hidden bg-muted">
-              <img
-                src={item.ogImage ?? 'https://i.sstatic.net/DZeBT.png'}
-                alt={item.title ?? 'Article thumbnail'}
-                className="h-full w-full object-cover transition-transform group-hover:scale-105"
-              />
-            </div>
-
-            <CardHeader className="space-y-3 pt-4">
-              <div className="flex items-center justify-between gap-2">
-                <Badge
-                  variant={item.status === 'COMPLETED' ? 'default' : 'outline'}
-                >
-                  {item.status.toLocaleLowerCase()}
-                </Badge>
-                <div className="flex gap-1">
-                  <Button
-                    onClick={async (e) => {
-                      e.preventDefault()
-                      await copyToClipboardFn(item.url)
-                    }}
-                    variant="outline"
-                    size="icon"
-                    className="size-8"
-                  >
-                    <Copy className="size-4" />
-                  </Button>
-                  <Button
-                    onClick={(e) => {
-                      e.preventDefault()
-                      handleDelete(item.id)
-                    }}
-                    variant="outline"
-                    size="icon"
-                    className="size-8 text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                    disabled={isDeleting}
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
-                </div>
+            <Link
+              to="/dashboard/items/$itemId"
+              params={{
+                itemId: item.id,
+              }}
+              className="block"
+            >
+              <div className="aspect-video w-full overflow-hidden bg-muted">
+                <img
+                  src={item.ogImage ?? 'https://i.sstatic.net/DZeBT.png'}
+                  alt={item.title ?? 'Article thumbnail'}
+                  className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                />
               </div>
 
-              <CardTitle className="line-clamp-1 text-xl leading-snug group-hover:text-amber-300 transition-colors">
-                {item.title}
-              </CardTitle>
-
-              {item.author && (
-                <p className="text-xs text-muted-foreground">{item.author}</p>
-              )}
-
-              {item.summary && (
-                <CardDescription className="line-clamp-3 text-sm">
-                  {item.summary}
-                </CardDescription>
-              )}
-
-              {item.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 pt-2">
-                  {item.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary">
-                      {tag}
-                    </Badge>
-                  ))}
+              <CardHeader className="space-y-3 pt-4">
+                <div className="flex items-center justify-between gap-2">
+                  <Badge
+                    variant={
+                      item.status === 'COMPLETED' ? 'default' : 'outline'
+                    }
+                  >
+                    {item.status.toLocaleLowerCase()}
+                  </Badge>
+                  <div className="flex gap-1">
+                    <Button
+                      onClick={async (e) => {
+                        e.preventDefault()
+                        await copyToClipboardFn(item.url)
+                      }}
+                      variant="outline"
+                      size="icon"
+                      className="size-8"
+                    >
+                      <Copy className="size-4" />
+                    </Button>
+                    <Button
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setPendingDeleteId(item.id)
+                        setModalOpen(true)
+                      }}
+                      variant="outline"
+                      size="icon"
+                      className="size-8 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                      disabled={isDeleting}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
                 </div>
-              )}
-            </CardHeader>
-          </Link>
-        </Card>
-      ))}
-    </div>
+
+                <CardTitle className="line-clamp-1 text-xl leading-snug group-hover:text-amber-300 transition-colors">
+                  {item.title}
+                </CardTitle>
+                {item.author && (
+                  <p className="text-xs text-muted-foreground">{item.author}</p>
+                )}
+
+                {item.summary && (
+                  <CardDescription className="line-clamp-3 text-sm">
+                    {item.summary}
+                  </CardDescription>
+                )}
+
+                {item.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 pt-2">
+                    {item.tags.map((tag) => (
+                      <Badge key={tag} variant="secondary">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </CardHeader>
+            </Link>
+          </Card>
+        ))}
+      </div>
+      <ConfirmModal
+        open={isModalOpen}
+        title="Delete Item"
+        description="Are you sure you want to delete this item? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onCancel={() => {
+          setModalOpen(false)
+          setPendingDeleteId(null)
+        }}
+        onConfirm={() => {
+          if (pendingDeleteId) {
+            handleDelete(pendingDeleteId)
+          }
+          setModalOpen(false)
+          setPendingDeleteId(null)
+        }}
+      />
+    </>
   )
 }

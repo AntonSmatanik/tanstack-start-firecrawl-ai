@@ -22,6 +22,17 @@ import { toast } from 'sonner'
 
 export const Route = createFileRoute('/dashboard/import/')({
   component: RouteComponent,
+  head: () => ({
+    meta: [
+      {
+        title: 'Import Content',
+      },
+      {
+        property: 'og:title',
+        content: 'Import Content',
+      },
+    ],
+  }),
 })
 
 function RouteComponent() {
