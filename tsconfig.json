@@ -17,7 +17,7 @@
       "@/*": ["./src/*"]
     },
     "lib": ["ES2024", "DOM", "DOM.Iterable"],
-    "types": ["vite/client"],
+    "types": ["vite/client", "vitest"],
 
     /* Bundler mode */
     "moduleResolution": "bundler",
